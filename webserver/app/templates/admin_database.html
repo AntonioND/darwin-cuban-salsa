@@ -1,0 +1,40 @@
+<!--
+    SPDX-License-Identifier: Zlib
+
+    Copyright (c) 2021 Antonio Niño Díaz
+-->
+
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Administration Panel - Attendees Database</h1>
+    <h3><a href="{{ url_for('admin') }}">Administration Panel</a></h3>
+    </br>
+    <form class="form" method="post" role="form">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+        {{ wtf.form_field(form.password) }}
+        <div class="form-group">
+            {{ wtf.form_field(form.download_database,
+                              button_map={'download_database':'success'}) }}
+        </div>
+        </br>
+        </br>
+        <div class="form-group">
+            {{ wtf.form_field(form.delete_non_darwin,
+                              button_map={'delete_non_darwin':'danger'}) }}
+            </br>
+            </br>
+            {{ wtf.form_field(form.database_reset,
+                              button_map={'database_reset':'danger'}) }}
+        </div>
+        </br>
+        </br>
+        {{ wtf.form_field(form.number_attendees) }}
+        <div class="form-group">
+            {{ wtf.form_field(form.update_number_attendees) }}
+        </div>
+    </form>
+{% endblock %}
+

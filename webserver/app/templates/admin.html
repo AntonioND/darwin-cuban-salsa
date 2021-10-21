@@ -1,0 +1,15 @@
+<!--
+    SPDX-License-Identifier: Zlib
+
+    Copyright (c) 2021 Antonio Niño Díaz
+-->
+
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Administration Panel</h1>
+    <h3><a href="{{ url_for('admin_database') }}">Attendees Database</a></h3>
+    <h3><a href="{{ url_for('admin_vaccines') }}">Vaccination Records</a></h3>
+    <h3><a href="{{ url_for('admin_event_log') }}">Webserver Event Log</a></h3>
+{% endblock %}

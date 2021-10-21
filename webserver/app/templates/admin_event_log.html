@@ -1,0 +1,27 @@
+<!--
+    SPDX-License-Identifier: Zlib
+
+    Copyright (c) 2021 Antonio Niño Díaz
+-->
+
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Administration Panel - Webserver Event Log</h1>
+    <h3><a href="{{ url_for('admin') }}">Administration Panel</a></h3>
+    </br>
+    <form class="form" method="post" role="form">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+        {{ wtf.form_field(form.password) }}
+        <div class="form-group">
+            {{ wtf.form_field(form.download_log) }}
+            </br>
+            </br>
+            {{ wtf.form_field(form.delete_log,
+                              button_map={'delete_log':'danger'}) }}
+        </div>
+    </form>
+{% endblock %}
+
