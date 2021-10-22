@@ -179,8 +179,8 @@ def book_lesson_internal(full_name, identifier, wants_rueda, is_darwin):
     Vaccination_Record_Update_Database()
 
     flash('Registration complete')
-    flash('Name: {} | CRSid/Email: {} | Darwin: {}'.format(
-        full_name, identifier, is_darwin))
+    flash('Name: {} | CRSid/Email: {} | Wants Rueda: {} | Darwin: {}'.format(
+          full_name, identifier, wants_rueda, is_darwin))
 
     max_attendees = Configuration_MaxAttendees_Get()
     if index > max_attendees:
@@ -206,7 +206,7 @@ def book_lesson():
             full_name = form.full_name.data
             is_darwin = "Yes" if form.is_darwin.data else "No"
             wants_rueda = "Yes" if form.wants_rueda.data else "No"
-            LogEvent_BookLesson(full_name, identifier, is_darwin)
+            LogEvent_BookLesson(full_name, identifier, wants_rueda, is_darwin)
             result = book_lesson_internal(full_name, identifier, wants_rueda,
                                           is_darwin)
             LogEvent_Result(result)
