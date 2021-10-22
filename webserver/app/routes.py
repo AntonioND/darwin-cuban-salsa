@@ -34,7 +34,7 @@ FILENAME_TEMP = "/home/" + app.config["USERNAME"] + "/temp.csv"
 
 def validate_name(string):
     for char in string:
-        if char.isalnum() or char in " ":
+        if char.isalnum() or char in " -.":
             continue
         return False
     return True
