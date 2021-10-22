@@ -9,7 +9,7 @@ from wtforms.validators import DataRequired
 
 class LoginForm(FlaskForm):
     full_name = StringField('Full Name', validators=[DataRequired()])
-    identifier = StringField('CRSid/Email (e.g.: abc123, example@gmail.com)',
+    identifier = StringField('CRSid or Email (e.g.: abc123, example@gmail.com)',
                              validators=[DataRequired()])
     wants_rueda = BooleanField('Tick this if you want to participate in ruedas '
                                '(rotating partners) (COVID PASS NEEDED!)')
@@ -18,13 +18,13 @@ class LoginForm(FlaskForm):
 
 
 class CheckForm(FlaskForm):
-    identifier = StringField('CRSid/Email (e.g.: abc123, example@gmail.com)',
+    identifier = StringField('CRSid or Email (e.g.: abc123, example@gmail.com)',
                              validators=[DataRequired()])
     submit = SubmitField('Check Booking')
 
 
 class CancelForm(FlaskForm):
-    identifier = StringField('CRSid/Email (e.g.: abc123, example@gmail.com)',
+    identifier = StringField('CRSid or Email (e.g.: abc123, example@gmail.com)',
                              validators=[DataRequired()])
     submit = SubmitField('Cancel Booking')
 
