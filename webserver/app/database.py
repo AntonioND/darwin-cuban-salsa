@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2021 Antonio Niño Díaz
 
+import base64
 import sqlite3
 import os
 
@@ -10,6 +11,20 @@ from app import app
 #import time
 
 DATABASE_PATH = "/home/" + app.config["USERNAME"] + "/attendees.db"
+
+
+def EncodeBase64(string):
+    string_bytes = string.encode('UTF-8')
+    base64_string_bytes = base64.b64encode(string_bytes)
+    base64_string = base64_string_bytes.decode('UTF-8')
+    return base64_string
+
+
+def DecodeBase64(base64_string):
+    base64_string_bytes = base64_string.encode('UTF-8')
+    string_bytes = base64.b64decode(base64_string_bytes)
+    string = string_bytes.decode('UTF-8')
+    return string
 
 
 def DatabaseExists():
@@ -44,12 +59,15 @@ def DatabaseAdd(full_name, identifier, wants_rueda, is_darwin):
     if DatabaseGetIndex(identifier) != -1:
         return False
 
+    full_name_base64 = EncodeBase64(full_name)
+    identifier_base64 = EncodeBase64(identifier)
+
     con = sqlite3.connect(DATABASE_PATH)
     with con:
         con.execute("""
             INSERT INTO attendees (name, identifier, wants_rueda, is_darwin, pass_received)
             VALUES ('{}','{}','{}','{}','{}');
-        """.format(full_name, identifier, wants_rueda, is_darwin, "-"))
+        """.format(full_name_base64, identifier_base64, wants_rueda, is_darwin, "-"))
         con.commit()
         #time.sleep(20)
 
@@ -57,6 +75,8 @@ def DatabaseAdd(full_name, identifier, wants_rueda, is_darwin):
 
 
 def DatabaseGetIndex(identifier):
+    identifier_base64 = EncodeBase64(identifier)
+
     con = sqlite3.connect(DATABASE_PATH)
     with con:
         rows = con.execute("""
@@ -64,7 +84,7 @@ def DatabaseGetIndex(identifier):
         """)
         count = 1
         for r in rows:
-            if r[2] == identifier:
+            if r[2] == identifier_base64:
                 return count
             count += 1
     return -1
@@ -75,12 +95,14 @@ def DatabaseDelete(identifier):
     if DatabaseGetIndex(identifier) == -1:
         return False
 
+    identifier_base64 = EncodeBase64(identifier)
+
     con = sqlite3.connect(DATABASE_PATH)
     with con:
         con.execute("""
             DELETE FROM attendees
             WHERE identifier = "{}";
-        """.format(identifier))
+        """.format(identifier_base64))
         con.commit()
 
     return True
@@ -124,11 +146,13 @@ def DatabaseClearVaccinationStatus():
 
 
 def DatabaseGetVaccinationStatus(identifier):
+    identifier_base64 = EncodeBase64(identifier)
+
     con = sqlite3.connect(DATABASE_PATH)
     with con:
         rows = con.execute("""
             SELECT * FROM attendees WHERE identifier = "{}";
-        """.format(identifier))
+        """.format(identifier_base64))
         for r in rows:
             return r[5]
 
@@ -140,13 +164,15 @@ def DatabaseSetVaccinated(identifier):
     if DatabaseGetIndex(identifier) == -1:
         return
 
+    identifier_base64 = EncodeBase64(identifier)
+
     con = sqlite3.connect(DATABASE_PATH)
     with con:
         con.execute("""
             UPDATE attendees
             SET pass_received = "Yes"
             WHERE identifier = "{}";
-        """.format(identifier))
+        """.format(identifier_base64))
         con.commit()
 
 
@@ -160,11 +186,15 @@ def DatabasePrint(max_attendees, filename):
             result = []
             if count <= max_attendees:
                 result.append(str(count))
-                result += row[1:]
+                result.append(DecodeBase64(row[1]))
+                result.append(DecodeBase64(row[2]))
+                result.extend(row[3:])
                 attendees.append(result)
             else:
                 result.append(str(count - max_attendees))
-                result += row[1:]
+                result.append(DecodeBase64(row[1]))
+                result.append(DecodeBase64(row[2]))
+                result.extend(row[3:])
                 wait_list.append(result)
 
             count += 1
