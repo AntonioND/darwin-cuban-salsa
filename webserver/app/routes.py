@@ -234,7 +234,8 @@ def check_booking_internal(identifier):
 
     max_attendees = Configuration_MaxAttendees_Get()
     if index > max_attendees:
-        flash("You are in the wait list!")
+        number = index - max_attendees
+        flash("You are in the wait list! You're number {}".format(number))
     else:
         flash("You can attend the lesson!")
     flash('CRSid/Email: {}'.format(identifier))
