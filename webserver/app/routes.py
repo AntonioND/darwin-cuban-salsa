@@ -290,7 +290,7 @@ def cancel_booking_internal(identifier):
     if not ok:
         flash('Failed to cancel')
         flash('CRSid/Email: {}'.format(identifier))
-        return
+        return 'Failed to cancel'
 
     flash('Cancelled')
     flash('CRSid/Email: {}'.format(identifier))
