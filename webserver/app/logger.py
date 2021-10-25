@@ -31,17 +31,6 @@ def LogEvent_WriteContext(f):
     except:
         f.write('User-Agent: Not found')
 
-    try:
-        f.write(request.headers.get('Accept-Language') + '\n')
-    except:
-        f.write('Accept-Language: Not found')
-
-    f.write('csrf_token: ')
-    try:
-        f.write(session.get('csrf_token') + '\n')
-    except:
-        f.write('Not found')
-
 
 def LogEvent_Result(result):
     with open(FILENAME_LOG, "a") as f:
