@@ -93,30 +93,42 @@ def index():
     return render_template('index.html', title='Home', count=count)
 
 
+MSG_COMMON = "Bookings open on Friday at 17:00 and end on Tuesday at 19:00"
+
+MSG_DARWIN = ("Darwin member: " +
+             "Bookings open on Friday at 17:00 and end on Tuesday at 19:00")
+
+MSG_NON_DARWIN = ("Not a Darwin member: " +
+                 "Bookings open on Sunday at 22:00 and end on Tuesday at 19:00")
+
+
 def check_booking_time(is_darwin):
     # First, check weekday
     if is_darwin == "Yes":
         # Darwin: Fridays, Saturdays, Sundays, Mondays and Tuesdays
         if not today_is_weekday_in([4, 5, 6, 0, 1]):
-            flash("Darwin member: "
-                  "Bookings open on Friday at 17:00 and end on Tuesday at 19:00")
-            return (False, 'Bookings closed - Darwin')
+            flash(MSG_DARWIN)
+            return (False, 'Bookings closed - Darwin (1)')
+
+        # If it is Friday, only allow bookings after 17:00
+        if today_is_weekday_in([4]) and datetime.now().hour < 17:
+            flash(MSG_DARWIN)
+            return (False, 'Bookings closed - Darwin (2)')
     else:
         # Non-Darwin: Only Mondays and Tuesdays are allowed
-        if not today_is_weekday_in([0, 1]):
-            flash("Not a Darwin member: "
-                  "Bookings open on Monday and end on Tuesday at 19:00")
-            return (False, 'Bookings closed - Non Darwin')
+        if not today_is_weekday_in([6, 0, 1]):
+            flash(MSG_NON_DARWIN)
+            return (False, 'Bookings closed - Non Darwin (1)')
 
-    # If it is Friday, only allow bookings after 17:00
-    if today_is_weekday_in([4]) and datetime.now().hour < 17:
-        flash("Bookings open at 17:00")
-        return (False, 'Bookings closed - Bookings open at 17:00')
+        # If it is Sunday, only allow bookings after 22:00
+        if today_is_weekday_in([6]) and datetime.now().hour < 22:
+            flash(MSG_NON_DARWIN)
+            return (False, 'Bookings closed - Non Darwin (2)')
 
     # If it is Tuesday, only allow bookings until 19:00
     if today_is_weekday_in([1]) and datetime.now().hour >= 19:
-        flash("Bookings end on Tuesday at 19:00")
-        return (False, 'Bookings closed - Lesson has started')
+        flash(MSG_COMMON)
+        return (False, 'Bookings closed - Common (1)')
 
     return (True, None)
 
@@ -124,18 +136,18 @@ def check_booking_time(is_darwin):
 def check_cancel_time():
     # Fridays, Saturdays, Sundays, Mondays and Tuesdays
     if not today_is_weekday_in([4, 5, 6, 0, 1]):
-        flash("Bookings open on Friday at 17:00 and end on Tuesday at 19:00")
-        return (False, 'Bookings closed')
+        flash(MSG_COMMON)
+        return (False, 'Bookings closed (1)')
 
     # If it is Friday, only allow bookings after 17:00
     if today_is_weekday_in([4]) and datetime.now().hour < 17:
-        flash("Bookings open at 17:00")
-        return (False, 'Bookings closed - Bookings open at 17:00')
+        flash(MSG_COMMON)
+        return (False, 'Bookings closed (2)')
 
     # If it is Tuesday, only allow booking cancellations until 19:00
     if today_is_weekday_in([1]) and datetime.now().hour >= 19:
-        flash("Bookings end on Tuesday at 19:00")
-        return (False, 'Bookings closed - Lesson has started')
+        flash(MSG_COMMON)
+        return (False, 'Bookings closed (3)')
 
     return (True, None)
 
