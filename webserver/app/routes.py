@@ -213,6 +213,7 @@ def book_lesson():
     if form.validate_on_submit():
         identifier = form.identifier.data
         identifier = identifier.replace(" ", "")
+        identifier = identifier.lower()
 
         lock_get()
         try:
@@ -265,6 +266,7 @@ def check_booking():
     if form.validate_on_submit():
         identifier = form.identifier.data
         identifier = identifier.replace(" ", "")
+        identifier = identifier.lower()
 
         lock_get()
         try:
@@ -317,6 +319,7 @@ def cancel_booking():
     if form.validate_on_submit():
         identifier = form.identifier.data
         identifier = identifier.replace(" ", "")
+        identifier = identifier.lower()
 
         lock_get()
         try:
