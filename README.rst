@@ -7,7 +7,7 @@ dependencies:
 .. code:: bash
 
     sudo apt install python3-pip python3-dev
-    sudo pip3 install flask flask-wtf flask-bootstrap uwsgi
+    pip3 install flask flask-wtf flask-bootstrap uwsgi
 
 HTML server
 -----------
