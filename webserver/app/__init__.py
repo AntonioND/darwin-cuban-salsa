@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Zlib
 #
-# Copyright (c) 2021 Antonio Niño Díaz
+# Copyright (c) 2021-2022 Antonio Niño Díaz
 
 import os
 import time
@@ -21,12 +21,8 @@ bootstrap = Bootstrap(app)
 from app import routes
 
 from app.database import *
-from app.vaccinations import *
 
-# Initialize databases if they don't exist
+# Initialize database if they don't exist
 
 if not DatabaseExists():
     DatabaseReset()
-
-if not Vaccination_Record_FileExists():
-    Vaccination_Record_Update("")

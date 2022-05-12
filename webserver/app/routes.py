@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Zlib
 #
-# Copyright (c) 2021 Antonio Niño Díaz
+# Copyright (c) 2021-2022 Antonio Niño Díaz
 
 from datetime import datetime, timedelta
 from flask import render_template, flash, redirect, request, send_file, url_for
@@ -10,7 +10,6 @@ from app.forms import *
 from app.configuration import *
 from app.database import *
 from app.logger import *
-from app.vaccinations import *
 
 # This is needed to make accesses to databases thread and process-safe
 if os.environ.get("DEBUG") == "true":
@@ -152,7 +151,7 @@ def check_cancel_time():
     return (True, None)
 
 
-def book_lesson_internal(full_name, identifier, wants_rueda, is_darwin):
+def book_lesson_internal(full_name, identifier, is_darwin):
 
     ok, error_str = check_booking_time(is_darwin)
     if not ok:
@@ -177,7 +176,7 @@ def book_lesson_internal(full_name, identifier, wants_rueda, is_darwin):
         flash('CRSid/Email: {}'.format(identifier))
         return 'Already registered'
 
-    ok = DatabaseAdd(full_name, identifier, wants_rueda, is_darwin)
+    ok = DatabaseAdd(full_name, identifier, is_darwin)
     if not ok:
         flash('Failed to register')
         flash('CRSid/Email: {}'.format(identifier))
@@ -188,11 +187,9 @@ def book_lesson_internal(full_name, identifier, wants_rueda, is_darwin):
         flash('Failed to verify registration')
         return 'Failed to verify'
 
-    Vaccination_Record_Update_Database()
-
     flash('Registration complete')
-    flash('Name: {} | CRSid/Email: {} | Wants Rueda: {} | Darwin: {}'.format(
-          full_name, identifier, wants_rueda, is_darwin))
+    flash('Name: {} | CRSid/Email: {} | Darwin: {}'.format(
+          full_name, identifier, is_darwin))
 
     max_attendees = Configuration_MaxAttendees_Get()
     if index > max_attendees:
@@ -200,9 +197,6 @@ def book_lesson_internal(full_name, identifier, wants_rueda, is_darwin):
         flash("You are in the wait list! You're number {}".format(number))
     else:
         flash("You can attend the lesson!")
-
-    if DatabaseGetVaccinationStatus(identifier) == "Yes":
-        flash("Vaccination records found!")
 
     return 'Success'
 
@@ -219,10 +213,8 @@ def book_lesson():
         try:
             full_name = form.full_name.data
             is_darwin = "Yes" if form.is_darwin.data else "No"
-            wants_rueda = "Yes" if form.wants_rueda.data else "No"
-            LogEvent_BookLesson(full_name, identifier, wants_rueda, is_darwin)
-            result = book_lesson_internal(full_name, identifier, wants_rueda,
-                                          is_darwin)
+            LogEvent_BookLesson(full_name, identifier, is_darwin)
+            result = book_lesson_internal(full_name, identifier, is_darwin)
             LogEvent_Result(result)
         finally:
             lock_release()
@@ -253,9 +245,6 @@ def check_booking_internal(identifier):
     else:
         flash("You can attend the lesson!")
     flash('CRSid/Email: {}'.format(identifier))
-
-    if DatabaseGetVaccinationStatus(identifier) == "Yes":
-        flash("Vaccination records found!")
 
     return 'Success'
 
@@ -394,28 +383,6 @@ def admin_database():
     lock_get()
     try:
         return admin_database_action(form)
-    finally:
-        lock_release()
-
-
-def admin_vaccines_action(form):
-    if form.update_vaccination_records.data:
-        if form.validate():
-            if check_admin_password_and_print_error(form, form.password.data):
-                LogEvent_Admin('VACCINATIONS UPDATE')
-                Vaccination_Record_Update(form.vaccination_records.data)
-
-    return render_template('admin_vaccines.html',
-                           title='Admin Vaccination Records', form=form)
-
-
-@app.route('/admin/vaccines', methods=['GET', 'POST'])
-def admin_vaccines():
-    form = AdminVaccinationsForm()
-
-    lock_get()
-    try:
-        return admin_vaccines_action(form)
     finally:
         lock_release()
 

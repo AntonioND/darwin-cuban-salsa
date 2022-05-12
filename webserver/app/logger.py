@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Zlib
 #
-# Copyright (c) 2021 Antonio Niño Díaz
+# Copyright (c) 2021-2022 Antonio Niño Díaz
 
 import os
 
@@ -37,12 +37,12 @@ def LogEvent_Result(result):
         f.write(result)
 
 
-def LogEvent_BookLesson(name, identifier, wants_rueda, is_darwin):
+def LogEvent_BookLesson(name, identifier, is_darwin):
     with open(FILENAME_LOG, "a") as f:
         f.write("\n\n")
         LogEvent_WriteContext(f)
-        f.write('BOOK({}, {}, {}, {}): '. format(
-                name, identifier, wants_rueda, is_darwin))
+        f.write('BOOK({}, {}, {}): '. format(
+                name, identifier, is_darwin))
 
 
 def LogEvent_CheckBooking(identifier):

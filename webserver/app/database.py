@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Zlib
 #
-# Copyright (c) 2021 Antonio Niño Díaz
+# Copyright (c) 2021-2022 Antonio Niño Díaz
 
 import base64
 import sqlite3
@@ -46,15 +46,13 @@ def DatabaseReset():
                 number INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 identifier TEXT NOT NULL,
-                wants_rueda STRING,
-                is_darwin STRING,
-                pass_received STRING
+                is_darwin STRING
             );
         """)
         con.commit()
 
 
-def DatabaseAdd(full_name, identifier, wants_rueda, is_darwin):
+def DatabaseAdd(full_name, identifier, is_darwin):
     # Don't allow multiple registrations by the same user
     if DatabaseGetIndex(identifier) != -1:
         return False
@@ -65,9 +63,9 @@ def DatabaseAdd(full_name, identifier, wants_rueda, is_darwin):
     con = sqlite3.connect(DATABASE_PATH)
     with con:
         con.execute("""
-            INSERT INTO attendees (name, identifier, wants_rueda, is_darwin, pass_received)
-            VALUES ('{}','{}','{}','{}','{}');
-        """.format(full_name_base64, identifier_base64, wants_rueda, is_darwin, "-"))
+            INSERT INTO attendees (name, identifier, is_darwin)
+            VALUES ('{}','{}','{}');
+        """.format(full_name_base64, identifier_base64, is_darwin))
         con.commit()
         #time.sleep(20)
 
@@ -134,48 +132,6 @@ def DatabaseGetSize():
     return 0
 
 
-def DatabaseClearVaccinationStatus():
-    con = sqlite3.connect(DATABASE_PATH)
-    with con:
-        rows = con.execute("""
-            UPDATE attendees
-            SET pass_received = "-";
-        """)
-        con.commit()
-    pass
-
-
-def DatabaseGetVaccinationStatus(identifier):
-    identifier_base64 = EncodeBase64(identifier)
-
-    con = sqlite3.connect(DATABASE_PATH)
-    with con:
-        rows = con.execute("""
-            SELECT * FROM attendees WHERE identifier = "{}";
-        """.format(identifier_base64))
-        for r in rows:
-            return r[5]
-
-    return ""
-
-
-def DatabaseSetVaccinated(identifier):
-    # Exit if the user doesn't exist
-    if DatabaseGetIndex(identifier) == -1:
-        return
-
-    identifier_base64 = EncodeBase64(identifier)
-
-    con = sqlite3.connect(DATABASE_PATH)
-    with con:
-        con.execute("""
-            UPDATE attendees
-            SET pass_received = "Yes"
-            WHERE identifier = "{}";
-        """.format(identifier_base64))
-        con.commit()
-
-
 def DatabasePrint(max_attendees, filename):
     with sqlite3.connect(DATABASE_PATH) as con, open(filename, "w") as f:
 
@@ -200,7 +156,7 @@ def DatabasePrint(max_attendees, filename):
             count += 1
 
         field_names = ['Booking Order', 'Full Name', 'CRSid/Email',
-                       'Wants Rueda', 'Darwin Student', 'Pass Received']
+                       'Darwin Student']
 
         fields = ", ".join('"' + i + '"' for i in field_names)
 
