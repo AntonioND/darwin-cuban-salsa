@@ -9,6 +9,14 @@ dependencies:
     sudo apt install python3-pip python3-dev
     pip3 install flask flask-wtf flask-bootstrap uwsgi
 
+Note: `uwsgi` isn't needed if you just want to test the website in debug mode.
+You can run the website in debug mode by running this command before starting
+the server:
+
+.. code:: bash
+
+    export DEBUG=true
+
 HTML server
 -----------
 
@@ -32,4 +40,4 @@ Website: http://www.skylyrac.net/
 
 GitHub: https://github.com/AntonioND
 
-Copyright (c) 2021, Antonio Niño Díaz
+Copyright (c) 2021-2022, Antonio Niño Díaz
