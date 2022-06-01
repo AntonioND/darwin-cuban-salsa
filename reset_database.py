@@ -33,5 +33,5 @@ def DatabaseReset():
         """)
         con.commit()
 
-if today_is_weekday_in([2, 3]):
+if today_is_weekday_in([2]):
     DatabaseReset()
